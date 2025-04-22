@@ -10,7 +10,7 @@ import numpy as np
 
 class FASTAProcessor:
     def __init__(self, config: RuntimeConfig, model_cfg: ModelConfig):
-        self.device = torch.device("cuda:4" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.config = config
         self.model_cfg = model_cfg
         self.sigmoid = torch.nn.Sigmoid()
@@ -169,6 +169,7 @@ if __name__ == "__main__":
     parser.add_argument("--out_folder", required=True, help="输出目录路径")
     parser.add_argument("--threshold", type=float, default=0.6)
     parser.add_argument("--batch_size", type=int, default=1024)
+
     
     args = parser.parse_args()
     
