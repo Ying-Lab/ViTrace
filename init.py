@@ -70,53 +70,6 @@ def matrix_from_fasta(fasta_file):
     # matrix = matrix.astype(np.int)
 
 
-# def filter_reads(fasta_file, read_indices):
-#     """
-#     从fasta文件中过滤出指定的reads
-
-#     :param fasta_file: fasta文件路径
-#     :param read_indices: 包含要保留的reads的索引的列表
-#     :return: 过滤后的fasta序列字符串
-#     """
-
-#     # 读取fasta文件
-#     with open(fasta_file) as f:
-#         fasta_dict = {}
-#         seq = ''
-#         header = ''
-#         i = 0
-#         for line in f:
-#             line = line.strip()
-#             if line.startswith('>'):
-#                 if seq != '':
-#                     fasta_dict[header] = seq
-#                     seq = ''
-#                 header = '>read{}'.format(i)  # 将索引转换为read名称
-#                 i += 1
-#             else:
-#                 seq += line
-#         fasta_dict[header] = seq
-
-#     # 过滤出指定的reads
-#     filtered_dict = {}
-#     for header, seq in fasta_dict.items():
-#         read_index = int(header[5:])  # 从read名称中获取索引
-#         if read_index in read_indices:
-#             filtered_dict[header] = seq
-
-#     # 生成过滤后的fasta序列字符串
-#     filtered_fasta = ''
-#     for header, seq in filtered_dict.items():
-#         filtered_fasta += header + '\n' + seq + '\n'
-
-#     # 将过滤后的fasta序列写入新文件
-#     output_file = fasta_file.replace('.fasta', '_filtered.fasta')  # 根据输入文件名生成输出文件名
-#     with open(output_file, 'w') as f:
-#         f.write(filtered_fasta)
-
-#     return filtered_fasta
-
-
 
 #############################################################################
 
