@@ -80,3 +80,7 @@ python main.py \
 |`--out_folder` | String | Yes|       -| OutPut directory path|
 | `--threshold`   | Float  | No       | 0.6     | Processing threshold |
 | `--batch_size`  | Int    | No       | 1024    | Batch size           |
+
+## Data Availability Statement
+All datasets used in this work, including training data, validation splits, and test benchmarks, are publicly available under open-access licenses via the Zenodo repository:
+* Persistent URL: https://zenodo.org/records/15259039
