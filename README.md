@@ -43,6 +43,28 @@ ViTrace
 
 ```
 
+
+---
+
+## 🧠 Pretrained Models
+
+ViTrace includes multiple pretrained models tailored to different scenarios. All models are located in the `params/` folder.
+
+| Model Name                  | Application Scenario                                     | Negative Class                         |
+|----------------------------|----------------------------------------------------------|----------------------------------------|
+| `best_model_48_o.pkl`      | **Default model** for human tumor transcriptomes         | Human transcripts                      |
+| `best_model_48_microbe.pkl`| Viral detection in metatranscriptomes                    | Microbial sequences (bacteria, fungi, etc.) |
+| `best_model_48_mouse.pkl`  | Viral detection in mouse tumor transcriptomes            | Mouse transcripts                      |
+
+> ✅ **Default production model:**  
+> `best_model_48_o.pkl` is automatically used for inference unless changed.
+
+
+---
+
+
+
+
 ## Dependencies
 ViTrace is a Python package. To install it, run the following command in your terminal:
 * clone repo, cd into it

@@ -104,10 +104,10 @@ class FASTAProcessor:
         
         # 加载权重（添加文件存在性检查）
         model_dir = self.config.model_path
-        # transformer_path = os.path.join(model_dir, "best_model_48_o.pkl")
-        # cnn_path = os.path.join(model_dir, "best_cnn_48_o.pkl")
-        transformer_path = os.path.join(model_dir, "best_model_48_mouse.pkl")
-        cnn_path = os.path.join(model_dir, "best_cnn_48_mouse.pkl")
+        transformer_path = os.path.join(model_dir, "best_model_48_o.pkl")
+        cnn_path = os.path.join(model_dir, "best_cnn_48_o.pkl")
+        # transformer_path = os.path.join(model_dir, "best_model_48_mouse.pkl")
+        # cnn_path = os.path.join(model_dir, "best_cnn_48_mouse.pkl")
         
         if not os.path.exists(transformer_path) or not os.path.exists(cnn_path):
             raise FileNotFoundError("模型权重文件缺失")
