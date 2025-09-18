@@ -9,10 +9,11 @@ from typing import Tuple
 import numpy as np
 
 class FASTAProcessor:
-    def __init__(self, config: RuntimeConfig, model_cfg: ModelConfig):
+    def __init__(self, config: RuntimeConfig, model_cfg: ModelConfig, model_type: str):
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.config = config
         self.model_cfg = model_cfg
+        self.model_type = model_type  # Store the model type for loading the correct weights
         self.sigmoid = torch.nn.Sigmoid()
         setup_seed(1001)
         self._initialize_models()
@@ -81,8 +82,8 @@ class FASTAProcessor:
                 global_offset += batch_size  # 关键修正点
 
         # 合并结果
-        final_scores = torch.cat(all_scores) if all_scores else torch.tensor([])
-        final_indices = torch.cat(all_indices) if all_indices else torch.tensor([])
+        final_scores = torch.cat(all_scores) if all_scores else torch.tensor([]) 
+        final_indices = torch.cat(all_indices) if all_indices else torch.tensor([]) 
         return final_scores, final_indices
 
     def _initialize_models(self):
@@ -102,12 +103,10 @@ class FASTAProcessor:
         
         self.cnn = VirusCNN().to(self.device)
         
-        # 加载权重（添加文件存在性检查）
+        # 根据model_type加载不同的模型文件
         model_dir = self.config.model_path
-        transformer_path = os.path.join(model_dir, "best_model_48_o.pkl")
-        cnn_path = os.path.join(model_dir, "best_cnn_48_o.pkl")
-        # transformer_path = os.path.join(model_dir, "best_model_48_mouse.pkl")
-        # cnn_path = os.path.join(model_dir, "best_cnn_48_mouse.pkl")
+        transformer_path = os.path.join(model_dir, f"best_model_48_{self.model_type}.pkl")
+        cnn_path = os.path.join(model_dir, f"best_cnn_48_{self.model_type}.pkl")
         
         if not os.path.exists(transformer_path) or not os.path.exists(cnn_path):
             raise FileNotFoundError("模型权重文件缺失")
@@ -147,10 +146,7 @@ class FASTAProcessor:
                     scores, indices = self.process_file(file_path)
                     if scores.numel() > 0:
                         filter_reads(file_path, indices.numpy(), self.config.output_folder)
-                        predictions.append((
-                            os.path.splitext(filename)[0], 
-                            scores.tolist()
-                        ))
+                        predictions.append((os.path.splitext(filename)[0], scores.tolist()))
                 except Exception as e:
                     print(f"处理 {filename} 失败: {str(e)}")
                     continue
@@ -169,9 +165,10 @@ if __name__ == "__main__":
     parser.add_argument("--out_folder", required=True, help="输出目录路径")
     parser.add_argument("--threshold", type=float, default=0.6)
     parser.add_argument("--batch_size", type=int, default=1024)
-    
+    parser.add_argument("--model_type", choices=['human', 'microbe', 'mouse'], default='human', help="选择模型类型")
+
     args = parser.parse_args()
-    
+
     # 配置类初始化（添加路径验证）
     try:
         runtime_cfg = RuntimeConfig(
@@ -183,7 +180,7 @@ if __name__ == "__main__":
             output_file=os.path.join(os.path.abspath(args.out_folder), "predictions.txt")
         )
         
-        processor = FASTAProcessor(runtime_cfg, ModelConfig())
+        processor = FASTAProcessor(runtime_cfg, ModelConfig(), args.model_type)  # 使用用户提供的model_type
         processor.run_pipeline()
         print(f"处理完成！结果保存在: {args.out_folder}")
     except Exception as e:

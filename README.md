@@ -15,6 +15,8 @@ ViTrace
 │  └─ ViTrace.jpg
 ├─ config.py
 ├─ demo
+│  ├─ demo_assemble
+│  │  ├─ AAACGGGAGAGCAATT-1.fasta
 │  ├─ human_demo
 │  │  ├─ AAACGGGAGAGCAATT-1.fasta
 │  │  ├─ AAAGTAGCAAGTCATC-1.fasta
@@ -30,10 +32,10 @@ ViTrace
 ├─ params
 │  ├─ best_cnn_48_microbe.pkl
 │  ├─ best_cnn_48_mouse.pkl
-│  ├─ best_cnn_48_o.pkl
+│  ├─ best_cnn_48_human.pkl
 │  ├─ best_model_48_microbe.pkl
 │  ├─ best_model_48_mouse.pkl
-│  └─ best_model_48_o.pkl
+│  └─ best_model_48_huamn.pkl
 ├─ ready
 │  ├─ test_x.npy
 │  ├─ test_y.npy
@@ -52,12 +54,12 @@ ViTrace includes multiple pretrained models tailored to different scenarios. All
 
 | Model Name                  | Application Scenario                                     | Negative Class                         |
 |----------------------------|----------------------------------------------------------|----------------------------------------|
-| `best_model_48_o.pkl`      | **Default model** for human tumor transcriptomes         | Human transcripts                      |
+| `best_model_48_human.pkl`      | **Default model** for human tumor transcriptomes         | Human transcripts                      |
 | `best_model_48_microbe.pkl`| Viral detection in metatranscriptomes                    | Microbial sequences (bacteria, fungi, etc.) |
 | `best_model_48_mouse.pkl`  | Viral detection in mouse tumor transcriptomes            | Mouse transcripts                      |
 
 > ✅ **Default production model:**  
-> `best_model_48_o.pkl` is automatically used for inference unless changed.
+> `best_model_48_human.pkl` is automatically used for inference unless changed.
 
 
 **Note on Model Comparisons**  
@@ -66,7 +68,7 @@ To improve transparency, the GitHub repository now includes performance metrics 
 
 | Model Name                  | ACC     | Precision | Recall  | F1     |
 |-----------------------------|---------|-----------|---------|--------|
-| `best_model_48_o.pkl`       | 0.7810  | 0.8461    | 0.7486  | 0.7944 |
+| `best_model_48_human.pkl`       | 0.7810  | 0.8461    | 0.7486  | 0.7944 |
 | `best_model_48_microbe.pkl` | 0.7646  | 0.7892    | 0.7703  | 0.7844 |
 | `best_model_48_mouse.pkl`   | 0.8996  | 0.8342    | 0.9780  | 0.9104 |
 
@@ -119,6 +121,7 @@ python main.py \
 |`--out_folder` | String | Yes|       -| OutPut directory path|
 | `--threshold`   | Float  | No       | 0.6     | Processing threshold |
 | `--batch_size`  | Int    | No       | 1024    | Batch size           |
+| `--model_type`  | String    | No       | human    | Specify model type (human, microbe, or mouse)         |
 ### Optional: Contig Assembly
 If you wish to assemble viral contigs from the filtered reads, you can use the provided assemble_contigs.py script. Execute the following command:
 
