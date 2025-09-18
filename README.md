@@ -173,6 +173,9 @@ python assemble_contigs.py \
 
 
 
-> **Video Presentation**  
->
- <video src="/workspace/data/ZF/VITrace/github/ViTrace/gihub_upload/assets/end2end_process.mp4" controls width="600"></video>
+### ▶️ Watch the End-to-End Tutorial on YouTube
+[![ViTrace End-to-End Tutorial](https://img.youtube.com/vi/ZObFf-iJvXw/0.jpg)](https://youtu.be/ZObFf-iJvXw)
+*Click the image above to watch the full tutorial on YouTube*
+
+### 💾 Download the Demo Video
+[Download the demonstration video](assets/videos/end2end_process.mp4)  
