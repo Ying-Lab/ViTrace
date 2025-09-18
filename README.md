@@ -147,7 +147,7 @@ python main.py \
 ```
 ```python
 python assemble_contigs.py \
-    --fasta reads.fasta \
+    --fasta demo/demo_assemble/AAACGGGAGAGCAATT-1.fasta \
     --scores out/predictions.txt \
     -k 24 \
     --ext-threshold 0.5 \
@@ -170,3 +170,9 @@ python assemble_contigs.py \
 
 > **Note**  
 > [viRNATrap](https://github.com/AuslanderLab/virnatrap) provides an alternative assembly implementation in C, which offers certain speed advantages compared to our Python version.
+
+
+
+> **Video Presentation**  
+>
+ <video src="/workspace/data/ZF/VITrace/github/ViTrace/gihub_upload/assets/end2end_process.mp4" controls width="600"></video>

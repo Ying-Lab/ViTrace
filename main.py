@@ -20,25 +20,24 @@ class FASTAProcessor:
 
     @staticmethod
     def batch_mean(inputs: torch.Tensor, outputs: torch.Tensor, seq_len: int) -> torch.Tensor:
-        """修正的批次平均计算"""
-        
+        """Corrected batch averaging"""
         num_fragments = math.ceil(seq_len / 48)
         return outputs.view(-1, num_fragments).mean(dim=1)
 
     def _predict_reads(self, test_loader) -> Tuple[torch.Tensor, torch.Tensor]:
-        """修复索引偏移的预测逻辑"""
+        """Prediction logic with index correction"""
         self.transformer.eval()
         self.cnn.eval()
         all_scores = []
         all_indices = []
-        global_offset = 0  # 新增全局偏移计数器
+        global_offset = 0  # Global offset counter
 
         with torch.no_grad():
             for batch in test_loader:
                 batch = batch.to(self.device)
                 batch_size, seq_len = batch.shape
                 
-                # 长序列处理逻辑
+                # Long sequence processing
                 if seq_len > 48:
                     fragments = []
                     for seq in batch:
@@ -51,43 +50,43 @@ class FASTAProcessor:
                     
                     fragments = torch.stack(fragments).to(self.device)
                     
-                    # CNN处理
+                    # CNN processing
                     c_inputs = torch.eye(4, device=self.device)[(fragments - 1).long()]
                     c_outputs = self.cnn(c_inputs.float().unsqueeze(1))
                     c_outputs = self.batch_mean(batch, c_outputs, seq_len)
                     
-                    # Transformer处理
+                    # Transformer processing
                     t_outputs = self.transformer(fragments)
                     t_outputs = self.batch_mean(batch, t_outputs, seq_len)
                     
                     outputs = torch.maximum(c_outputs, t_outputs)
                 else:
-                    # 短序列处理
+                    # Short sequence processing
                     c_inputs = torch.eye(4, device=self.device)[(batch - 1).long()]
                     c_outputs = self.cnn(c_inputs.float().unsqueeze(1)).squeeze(1)
                     t_outputs = self.transformer(batch).squeeze(1)
                     outputs = torch.maximum(c_outputs, t_outputs)
 
-                # 概率计算
+                # Probability calculation
                 probs = self.sigmoid(outputs).flatten()
                 
-                # 索引修正（添加全局偏移）
+                # Index correction (with global offset)
                 batch_indices = torch.where(probs > self.config.threshold)[0]
                 global_indices = batch_indices + global_offset
                 
                 all_scores.append(probs.cpu())
                 all_indices.append(global_indices.cpu())
                 
-                # 更新偏移量
-                global_offset += batch_size  # 关键修正点
+                # Update offset
+                global_offset += batch_size
 
-        # 合并结果
+        # Combine results
         final_scores = torch.cat(all_scores) if all_scores else torch.tensor([]) 
         final_indices = torch.cat(all_indices) if all_indices else torch.tensor([]) 
         return final_scores, final_indices
 
     def _initialize_models(self):
-        """模型初始化（添加维度验证）"""
+        """Model initialization (with dimension validation)"""
         self.transformer = Transformer(
             src_vocab_size=5,
             src_pad_idx=0,
@@ -103,27 +102,27 @@ class FASTAProcessor:
         
         self.cnn = VirusCNN().to(self.device)
         
-        # 根据model_type加载不同的模型文件
+        # Load model weights according to model_type
         model_dir = self.config.model_path
         transformer_path = os.path.join(model_dir, f"best_model_48_{self.model_type}.pkl")
         cnn_path = os.path.join(model_dir, f"best_cnn_48_{self.model_type}.pkl")
         
         if not os.path.exists(transformer_path) or not os.path.exists(cnn_path):
-            raise FileNotFoundError("模型权重文件缺失")
+            raise FileNotFoundError("Model weight files are missing")
             
         self.transformer.load_state_dict(torch.load(transformer_path, map_location="cpu"))
         self.cnn.load_state_dict(torch.load(cnn_path, map_location="cpu"))
 
     def process_file(self, file_path: str) -> Tuple[torch.Tensor, torch.Tensor]:
-        """带维度验证的文件处理"""
+        """Process a single FASTA file (with dimension validation)"""
         if not os.path.exists(file_path):
-            raise FileNotFoundError(f"文件不存在: {file_path}")
+            raise FileNotFoundError(f"File not found: {file_path}")
             
-        print(f"正在处理: {os.path.basename(file_path)}")
+        print(f"Processing: {os.path.basename(file_path)}")
         test_x = matrix_from_fasta(file_path)
         
         if test_x.ndim != 2:
-            raise ValueError(f"输入维度错误: 应为二维矩阵，实际为 {test_x.shape}")
+            raise ValueError(f"Invalid input dimensions: expected 2D matrix, got {test_x.shape}")
             
         test_tensor = torch.tensor(test_x, device=self.device)
         test_loader = torch.utils.data.DataLoader(
@@ -135,7 +134,7 @@ class FASTAProcessor:
         return self._predict_reads(test_loader)
 
     def run_pipeline(self):
-        """完整执行流程（添加路径验证）"""
+        """Run the complete pipeline (with path validation)"""
         os.makedirs(self.config.output_folder, exist_ok=True)
         
         predictions = []
@@ -148,28 +147,28 @@ class FASTAProcessor:
                         filter_reads(file_path, indices.numpy(), self.config.output_folder)
                         predictions.append((os.path.splitext(filename)[0], scores.tolist()))
                 except Exception as e:
-                    print(f"处理 {filename} 失败: {str(e)}")
+                    print(f"Failed to process {filename}: {str(e)}")
                     continue
         
-        # 保存结果（添加空结果保护）
+        # Save results (with empty result check)
         if predictions:
             with open(self.config.output_file, "w") as f:
                 for name, scores in predictions:
                     f.write(f"{name}\t{scores}\n")
         else:
-            print("警告: 未生成任何预测结果")
+            print("Warning: No predictions were generated")
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="ViTrace病毒序列分析工具")
-    parser.add_argument("--in_folder", required=True, help="输入目录路径")
-    parser.add_argument("--out_folder", required=True, help="输出目录路径")
+    parser = argparse.ArgumentParser(description="ViTrace virus sequence analysis tool")
+    parser.add_argument("--in_folder", required=True, help="Input folder path")
+    parser.add_argument("--out_folder", required=True, help="Output folder path")
     parser.add_argument("--threshold", type=float, default=0.6)
     parser.add_argument("--batch_size", type=int, default=1024)
-    parser.add_argument("--model_type", choices=['human', 'microbe', 'mouse'], default='human', help="选择模型类型")
+    parser.add_argument("--model_type", choices=['human', 'microbe', 'mouse'], default='human', help="Select model type")
 
     args = parser.parse_args()
 
-    # 配置类初始化（添加路径验证）
+    # Initialize configuration (with path validation)
     try:
         runtime_cfg = RuntimeConfig(
             input_folder=os.path.abspath(args.in_folder),
@@ -180,8 +179,8 @@ if __name__ == "__main__":
             output_file=os.path.join(os.path.abspath(args.out_folder), "predictions.txt")
         )
         
-        processor = FASTAProcessor(runtime_cfg, ModelConfig(), args.model_type)  # 使用用户提供的model_type
+        processor = FASTAProcessor(runtime_cfg, ModelConfig(), args.model_type)  # Use user-specified model_type
         processor.run_pipeline()
-        print(f"处理完成！结果保存在: {args.out_folder}")
+        print(f"Processing complete! Results saved in: {args.out_folder}")
     except Exception as e:
-        print(f"初始化失败: {str(e)}")
+        print(f"Initialization failed: {str(e)}")
