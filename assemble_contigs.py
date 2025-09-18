@@ -133,7 +133,7 @@ def main():
     parser.add_argument("--seed-threshold", type=float, default=0.7, help="Seed read score threshold (default: 0.7)")
     parser.add_argument("--max-proc", type=int, default=cpu_count(), help="Max number of processes (default: all CPUs)")
     parser.add_argument("-o", "--output", default="assembled_contigs.fasta", help="Output FASTA file path")
-    parser.add_argument("--min-len", type=int, default=500, help="Minimum contig length to output")
+    parser.add_argument("--min-len", type=int, default=90, help="Minimum contig length to output")
     args = parser.parse_args()
 
     # 读取数据

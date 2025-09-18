@@ -10,7 +10,7 @@ import numpy as np
 
 class FASTAProcessor:
     def __init__(self, config: RuntimeConfig, model_cfg: ModelConfig):
-        self.device = torch.device("cuda:4" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.config = config
         self.model_cfg = model_cfg
         self.sigmoid = torch.nn.Sigmoid()
