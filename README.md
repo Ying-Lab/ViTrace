@@ -132,6 +132,27 @@ python assemble_contigs.py \
     --max-proc 48 \
     -o assembled_contigs.fasta
 ```
+
+### Demo
+
+```python
+python main.py \
+--in_folder demo/demo_assemble \
+--out_folder out \
+--threshold 0.5 \
+--batch_size 1024
+```
+```python
+python assemble_contigs.py \
+    --fasta reads.fasta \
+    --scores out/predictions.txt \
+    -k 24 \
+    --ext-threshold 0.5 \
+    --seed-threshold 0.7 \
+    --max-proc 48 \
+    -o assembled_contigs.fasta
+```
+
 ### Parameters
 
 | Flag             | Description                                                                 |
